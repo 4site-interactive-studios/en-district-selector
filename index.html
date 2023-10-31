@@ -8,11 +8,44 @@
     <style>
         [id^="districts"] {
             grid-template-columns: repeat(auto-fill, 16ch);
+            margin-bottom: 1rem;
         }
 
         #state-container>div>label,
         #state-container>div>button {
             margin-left: 1ch;
+        }
+
+        #state-container>div>div>div {
+            display: flex;
+            align-items: center;
+        }
+
+        #state-container>div>div>div label {
+            margin-left: 0.5ch;
+        }
+
+        .state-district {
+            background-color: blue;
+            /* Or any other styling you want for State districts */
+        }
+
+        .house-district {
+            background-color: red;
+            /* Or any other styling you want for House districts */
+        }
+
+        #output {
+            clip: rect(0 0 0 0);
+            border: 0;
+            clip-path: inset(50%);
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            white-space: nowrap;
+            width: 1px
         }
     </style>
 </head>
@@ -27,12 +60,12 @@
         class="mb-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
         Copy to Clipboard
     </button>
-    <textarea id="output" readonly class="w-full p-2 rounded border" style="display:none;"></textarea>
+    <textarea id="output" readonly class="w-full p-2 rounded border"></textarea>
 
     <script>
         const selectedDistricts = new Set();
         const stateDistrictCount = new Map();
-        const stateDistrictData = {};
+        let stateDistrictData = {};
         const outputArea = document.getElementById('output');
         const debouncedUpdateOutput = _.debounce(updateOutput, 300);
         function populateData(defaultCSVData) {
@@ -71,11 +104,11 @@
 
                 // Added this new div
                 const stateLabelWrapper = document.createElement('div');
-                stateLabelWrapper.className = 'state-label-wrapper flex items-center gap-x-1';
+                stateLabelWrapper.className = 'state-label-wrapper flex items-center gap-x-1 mb-2';
 
                 const toggleButton = document.createElement('button');
                 toggleButton.innerHTML = 'View all';
-                toggleButton.className = 'text-gray-900 bg-white border rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 font-mono'; // Monospaced font
+                toggleButton.className = 'text-gray-900 bg-white border rounded-lg text-sm px-5 py-2.5 mr-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 font-mono'; // Monospaced font
                 toggleButton.addEventListener('click', function () {
                     toggleDistricts(state, toggleButton);
                 });
@@ -93,7 +126,13 @@
                 const sortedDistricts = stateDistrictData[state].sort();
                 sortedDistricts.forEach(district => {
                     const districtContainer = document.createElement('div');
-                    districtContainer.className = 'district-label-wrapper flex items-center gap-x-1';
+
+                    // Determine district type and add appropriate CSS class
+                    if (district.startsWith('State')) {
+                        districtContainer.className = 'district-label-wrapper flex items-center gap-x-1 state-districts';
+                    } else if (district.startsWith('House')) {
+                        districtContainer.className = 'district-label-wrapper flex items-center gap-x-1 house-districts';
+                    }
 
                     const districtCheckbox = document.createElement('input');
                     districtCheckbox.type = 'checkbox';
@@ -204,18 +243,31 @@
         }
 
         function updateSummaryLabel(stateDistrictData) {
+            // Check if stateDistrictData is defined
+            if (!stateDistrictData) {
+                // console.warn('stateDistrictData is not defined');
+                return;
+            }
+
             let summaryText = "";
             const sortedStates = Array.from(stateDistrictCount.keys()).sort();
             sortedStates.forEach(state => {
                 const count = stateDistrictCount.get(state);
                 if (count > 0) {
-                    const totalCount = stateDistrictData[state].length;
-                    summaryText += `${count} of ${totalCount} ${state} Districts<br>`;
+                    // Check if stateDistrictData for the specific state is defined
+                    if (stateDistrictData[state]) {
+                        const totalCount = stateDistrictData[state].length;
+                        summaryText += `${count} of ${totalCount} ${state} Districts<br>`;
+                    } else {
+                        console.warn(`No data available for state: ${state}`);
+                    }
                 }
             });
             summaryText = summaryText.slice(0, -4); // Remove trailing <br>
             document.getElementById('summaryLabel').innerHTML = summaryText;
         }
+
+
 
 
         function copyToClipboard() {
