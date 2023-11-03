@@ -1,0 +1,55 @@
+#state-container,
+[id^="districts"] h3 + div{
+    column-width: 16ch;
+}
+
+[id^="districts"] {
+    /* grid-template-columns: repeat(auto-fill, 16ch); */
+    margin-bottom: 1rem;
+}
+
+
+
+#state-container label,
+#district-container label,
+#state-container button,
+#district-container button {
+    margin-left: 1ch;
+}
+
+#state-container>div>div>div {
+    display: flex;
+    align-items: center;
+}
+
+#state-container>div>div>div label {
+    margin-left: 0.5ch;
+}
+
+.state-district {
+    background-color: blue;
+}
+
+.house-district {
+    background-color: red;
+}
+
+#output {
+    clip: rect(0 0 0 0);
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px
+}
+
+/* New styles */
+.district-active,
+.state-active {
+    border-color: #34D399; /* Tailwind green color */
+    background-color: #F0FFF4; /* Tailwind green lightest color */
+}
