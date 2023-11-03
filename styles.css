@@ -3,6 +3,11 @@
     column-width: 16ch;
 }
 
+input,
+input + label{
+    cursor: pointer;
+}
+
 [id^="districts"] {
     /* grid-template-columns: repeat(auto-fill, 16ch); */
     margin-bottom: 1rem;

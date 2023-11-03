@@ -25,16 +25,16 @@
     <h2 class="text-xl mb-2">Select States</h2>
     <div id="state-container" class="mb-4"></div>
 
-    <h2 class="text-xl mb-2" id="selectDistrictsHeader">Select Districts</h2>
+    <h2 class="text-xl mb-2" id="selectDistrictsHeader" style="display:none;">Select Districts</h2>
     <div id="district-container" class="mb-4"></div>
 
-    <h2 class="text-xl mb-2" id="selectedDistrictsHeader">Selected Districts</h2>
-    <p id="summaryLabel" class="mb-2"></p>
+    <h2 class="text-xl mb-2" id="selectedDistrictsHeader" style="display:none;">Selected Districts</h2>
+    <p id="summaryLabel" class="mb-2" style="display:none;"></p>
     <button onclick="copyToClipboard()" id="copyButton"
-        class="mb-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        class="mb-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" style="display:none;">
         Copy to Clipboard
     </button>
-    <textarea id="output" readonly class="w-full p-2 rounded border"></textarea>
+    <textarea id="output" readonly class="w-full p-2 rounded border" style="display:none;"></textarea>
 
 
     <script src="lodash.min.js"></script>
@@ -203,6 +203,7 @@
                 document.getElementById('output').style.display = 'none';
             }
 
+            updateSummaryLabel();
             updateSummaryLabel(stateDistrictData);
         };
 
@@ -216,6 +217,7 @@
             const districtElement = document.getElementById(district);
             if (isChecked) {
                 selectedDistricts.add(district);
+                console.log("Updated selectedDistricts set:", Array.from(selectedDistricts));
                 districtElement.parentElement.classList.add('district-active');
             } else {
                 selectedDistricts.delete(district);
@@ -225,6 +227,7 @@
             console.log("Current selectedDistricts:", Array.from(selectedDistricts));
 
             updateDistrictHeader(state, district);
+            updateSummaryLabel();
             debouncedUpdateOutput();
         }
 
@@ -289,22 +292,39 @@
         const debouncedUpdateOutput = _.debounce(updateOutput, 300);
 
         // 6. Update Summary Label
-        const updateSummaryLabel = stateDistrictData => {
+        // 6. Update Summary Label
+        const updateSummaryLabel = () => {
             console.log("Step 6");
-            let summaryText = "";
-            const sortedStates = Array.from(stateDistrictCount.keys()).sort();
-            sortedStates.forEach(state => {
-                const count = stateDistrictCount.get(state);
-                if (count > 0) {
-                    const totalCountHouse = stateDistrictData[state].House.count;
-                    const totalCountSenate = stateDistrictData[state].Senate.count;
 
-                    summaryText += `${count} of ${totalCount} ${state} Districts<br>`;
+            let summaryText = "";
+            let totalStatesSelected = 0;
+            let totalDistrictsSelected = 0;
+
+            // Sorted list of states in selectedDistricts
+            const sortedStates = Array.from(new Set([...selectedDistricts].map(d => d.slice(0, 2)))).sort();
+
+            sortedStates.forEach(state => {
+                for (const category in stateDistrictData[state]) {
+                    const totalDistricts = stateDistrictData[state][category].count;
+                    const categoryChar = category === "House" ? "H" : "S";
+                    const selectedCount = Array.from(selectedDistricts).filter(d => d.slice(0, 2) === state && d.slice(-1) === categoryChar).length;
+
+                    console.log(`State: ${state}, Category: ${category}, Selected Count: ${selectedCount}`);
+                    console.log("UpdateSummaryLabel called. Current selectedDistricts:", Array.from(selectedDistricts));
+
+                    if (selectedCount > 0) {
+                        totalStatesSelected += 1;
+                        totalDistrictsSelected += selectedCount;
+                        summaryText += `${state} ${category} (${selectedCount} of ${totalDistricts} Districts Selected)<br>`;
+                    }
                 }
             });
-            summaryText = summaryText.slice(0, -4); // Remove trailing <br>
+
+            summaryText += `${totalStatesSelected} States Selected, ${totalDistrictsSelected} Total Districts`;
+
             document.getElementById('summaryLabel').innerHTML = summaryText;
         }
+
 
         // 7. Copy to Clipboard Function
         const copyToClipboard = () => {
