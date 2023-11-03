@@ -121,9 +121,6 @@ states, categories, and districts.
                 checkbox.id = state;
                 checkbox.classList = 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500';
                 checkbox.value = state;
-                checkbox.addEventListener('change', function (event) {
-                    handleStateChange(event, state, stateDistrictData[state], stateDistrictData);
-                });
 
                 const label = document.createElement('label');
                 label.htmlFor = state;
@@ -339,7 +336,6 @@ states, categories, and districts.
         const debouncedUpdateOutput = _.debounce(updateOutput, 300);
 
         // 6. Update Summary Label
-        // 6. Update Summary Label
         const updateSummaryLabel = () => {
             console.log("Step 6");
 
@@ -371,6 +367,38 @@ states, categories, and districts.
 
             document.getElementById('summaryLabel').innerHTML = summaryText;
         }
+
+        // Modified function to utilize event delegation for states
+        const handleStateChangeWithDelegation = (event) => {
+            const checkbox = event.target;
+            const state = checkbox.value;
+
+            if (checkbox.type !== 'checkbox' || !stateDistrictData[state]) {
+                return; // Ignore if the clicked element isn't a state checkbox
+            }
+
+            handleStateChange(event, state, stateDistrictData[state], stateDistrictData);
+        };
+
+        // Modified function to utilize event delegation for districts
+        const handleDistrictChangeWithDelegation = (event) => {
+            const checkbox = event.target;
+            const district = checkbox.value;
+
+            // Identify the state by examining the parent div's ID
+            const state = checkbox.closest('div[id^="districts-"]').id.replace('districts-', '');
+
+            if (checkbox.type !== 'checkbox' || !district) {
+                return; // Ignore if the clicked element isn't a district checkbox
+            }
+
+            handleDistrictChange(checkbox.checked, district, state);
+        };
+
+        // Attach event listeners using delegation
+        document.getElementById('state-container').addEventListener('change', handleStateChangeWithDelegation);
+        document.getElementById('district-container').addEventListener('change', handleDistrictChangeWithDelegation);
+
 
         // 7. Copy to Clipboard Function
         const copyToClipboard = () => {
