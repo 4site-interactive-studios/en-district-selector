@@ -1,3 +1,37 @@
+<!--
+/**
+* State District Selector:
+*
+* 1. Allows users to select states and their corresponding districts.
+*
+* 2. Displays a list of states with checkboxes. On selecting a state:
+* - The districts associated with that state are dynamically populated below.
+* - The districts are sorted alphabetically for easy identification.
+*
+* 3. Each state's districts are organized under the categories "House" and "Senate".
+*
+* 4. Provides "Select All" and "Deselect All" buttons for each category (House and Senate) within a state,
+* allowing users to quickly select or deselect all districts in that category.
+*
+* 5. Tracks the number of selected districts and updates category headers to reflect the number of selected districts.
+*
+* 6. Provides a dynamic summary label that shows a breakdown of the selected districts by state and category.
+* It also provides a total count of selected states and districts.
+*
+* 7. Offers a "Copy to Clipboard" button that lets users copy the list of selected districts to their clipboard.
+* The copied list of districts is delimited by the tilde (~) character.
+*
+* 8. Initializes the UI by loading district data and populating the state checkboxes on document load.
+*
+* Additional Features:
+* - Uses the Lodash library for debounced updates, ensuring efficient performance during rapid interactions.
+* - Ensures user-friendly experience with responsive design using the Tailwind CSS framework.
+*
+* Note: This selector is designed to be used with an external data source (`defaultCSVData`) which provides the list of
+states, categories, and districts.
+*/
+-->
+
 <!DOCTYPE html>
 <html>
 
@@ -9,7 +43,7 @@
 
 <body class="bg-gray-100 p-8">
     <h1 class="text-3xl mb-4">Select State Districts</h1>
-
+    <!-- 
     <div class="mb-4">
         <label>
             <input type="radio" name="category" value="Both" checked> Both House and Senate
@@ -22,18 +56,19 @@
         </label>
     </div>
 
-    <h2 class="text-xl mb-2">Select States</h2>
+    <h2 class="text-xl mb-2">Select States</h2> -->
     <div id="state-container" class="mb-4"></div>
 
-    <h2 class="text-xl mb-2" id="selectDistrictsHeader" style="display:none;">Select Districts</h2>
+    <!-- <h2 class="text-xl mb-2" id="selectDistrictsHeader" style="display:none;">Select Districts</h2> -->
     <div id="district-container" class="mb-4"></div>
 
-    <h2 class="text-xl mb-2" id="selectedDistrictsHeader" style="display:none;">Selected Districts</h2>
-    <p id="summaryLabel" class="mb-2" style="display:none;"></p>
+    <!-- <h2 class="text-xl mb-2" id="selectedDistrictsHeader" style="display:none;">Selected Districts</h2> -->
+
     <button onclick="copyToClipboard()" id="copyButton"
         class="mb-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" style="display:none;">
         Copy to Clipboard
     </button>
+    <p id="summaryLabel" class="mb-2" style="display:none;"></p>
     <textarea id="output" readonly class="w-full p-2 rounded border" style="display:none;"></textarea>
 
 
@@ -71,8 +106,6 @@
             populateStates(stateDistrictData);
             console.log(stateDistrictData);
         }
-
-
 
         // 2a. Populating States
         console.log("2a. Populating States");
@@ -124,6 +157,36 @@
                 categoryLabel.textContent = `${state} ${category} (0 of ${districts[category].count} Districts Selected)`;
                 categoryDiv.appendChild(categoryLabel);
 
+                // Create the Select All button
+                const selectAllButton = document.createElement('button');
+                selectAllButton.textContent = "Select All";
+                selectAllButton.className = "bg-blue-500 text-white px-3 py-1 rounded mr-2"; // Some basic styling
+                selectAllButton.addEventListener('click', function () {
+                    districts[category].districts.forEach(district => {
+                        const checkbox = document.getElementById(district);
+                        if (checkbox && !checkbox.checked) {
+                            checkbox.checked = true;
+                            handleDistrictChange(true, district, state); // Trigger the district change handler
+                        }
+                    });
+                });
+                categoryDiv.appendChild(selectAllButton);
+
+                // Create the Deselect All button
+                const deselectAllButton = document.createElement('button');
+                deselectAllButton.textContent = "Deselect All";
+                deselectAllButton.className = "bg-red-500 text-white px-3 py-1 rounded mb-3"; // Some basic styling
+                deselectAllButton.addEventListener('click', function () {
+                    districts[category].districts.forEach(district => {
+                        const checkbox = document.getElementById(district);
+                        if (checkbox && checkbox.checked) {
+                            checkbox.checked = false;
+                            handleDistrictChange(false, district, state); // Trigger the district change handler
+                        }
+                    });
+                });
+                categoryDiv.appendChild(deselectAllButton);
+
                 const districtWrapper = document.createElement('div'); // Wrapping the districts
 
                 districts[category].districts.forEach(district => {
@@ -132,6 +195,7 @@
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.id = district;
+                    checkbox.classList = "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500";
                     checkbox.value = district;
                     checkbox.addEventListener('change', function () {
                         handleDistrictChange(this.checked, this.value, state);
@@ -154,7 +218,6 @@
 
             districtContainer.appendChild(stateWrapper);
         }
-
 
         // 3. Handling State Changes
         const handleStateChange = (event, state, districts, stateDistrictData) => {
@@ -182,22 +245,22 @@
             const anyStateSelected = [...document.querySelectorAll("#state-container input[type='checkbox']")].some(checkbox => checkbox.checked);
 
             // Get references to the elements you want to hide/show
-            const selectDistrictsHeader = document.getElementById('selectDistrictsHeader');
-            const selectedDistrictsHeader = document.getElementById('selectedDistrictsHeader');
+            // const selectDistrictsHeader = document.getElementById('selectDistrictsHeader');
+            // const selectedDistrictsHeader = document.getElementById('selectedDistrictsHeader');
             const copyButton = document.getElementById('copyButton');
 
             // Toggle visibility based on state selection
             if (anyStateSelected) {
-                selectDistrictsHeader.style.display = 'block';
+                // selectDistrictsHeader.style.display = 'block';
                 document.getElementById('district-container').style.display = 'block';
-                selectedDistrictsHeader.style.display = 'block';
+                // selectedDistrictsHeader.style.display = 'block';
                 document.getElementById('summaryLabel').style.display = 'block';
                 copyButton.style.display = 'block';
                 document.getElementById('output').style.display = 'block';
             } else {
-                selectDistrictsHeader.style.display = 'none';
+                // selectDistrictsHeader.style.display = 'none';
                 document.getElementById('district-container').style.display = 'none';
-                selectedDistrictsHeader.style.display = 'none';
+                // selectedDistrictsHeader.style.display = 'none';
                 document.getElementById('summaryLabel').style.display = 'none';
                 copyButton.style.display = 'none';
                 document.getElementById('output').style.display = 'none';
@@ -206,10 +269,6 @@
             updateSummaryLabel();
             updateSummaryLabel(stateDistrictData);
         };
-
-
-
-
 
         // 4a. Handling District Changes
         const handleDistrictChange = (isChecked, district, state) => {
@@ -230,8 +289,6 @@
             updateSummaryLabel();
             debouncedUpdateOutput();
         }
-
-
 
         // 4b. Update District Header
         const updateDistrictHeader = (state) => {
@@ -266,16 +323,6 @@
                 }
             }
         }
-
-
-
-
-
-
-
-
-
-
 
         // 5. Update Output Function
         const updateOutput = () => {
@@ -324,7 +371,6 @@
 
             document.getElementById('summaryLabel').innerHTML = summaryText;
         }
-
 
         // 7. Copy to Clipboard Function
         const copyToClipboard = () => {
