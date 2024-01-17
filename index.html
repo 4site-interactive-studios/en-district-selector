@@ -97,8 +97,8 @@
       Copy <span class="selected-districts-count">0</span> districts to clipboard
     </button>
     <p>
-      <span class="selected-states-count">0</span> States Selected,
-      <span class="possible-districts-count">0</span> Total Districts
+      <span class="states-with-selected-districts-count">0</span> of <span class="selected-states-count">0</span> States Selected,
+      <span class="selected-districts-count">0</span> of <span class="possible-districts-count">0</span> Districts/Wards Selected
     </p>
   </div>
 </div>
@@ -113,6 +113,9 @@
       this.createStatesCheckboxes();
       this.setupCopyDistrictsButton();
       this.setupSelectAndDeselectAllButtons();
+      const districtContainer = document.getElementById('district-container');
+      districtContainer.addEventListener('change', this.onDistrictChange.bind(this));
+      districtContainer.addEventListener('click', this.onDistrictClick.bind(this));
     }
 
     getDataFromCsv() {
@@ -138,7 +141,7 @@
       const statesContainer = document.getElementById('state-container');
 
       let stateCheckboxHtml = '';
-      Object.keys(this.districtsData).forEach(state => {
+      Object.keys(this.districtsData).sort().forEach(state => {
         stateCheckboxHtml += `
           <div class="checkbox">
             <input type="checkbox" name="state" value="${state}" id="checkbox-${state}">
@@ -158,66 +161,93 @@
       const statesContainer = document.getElementById('state-container');
       const districtContainer = document.getElementById('district-container');
 
-      this.selectedStates = [...statesContainer.querySelectorAll('input[name="state"]:checked')].map(input => input.value);
+      const prevSelectedStates = this.selectedStates;
+      this.selectedStates = [...statesContainer.querySelectorAll('input[name="state"]:checked')]
+        .map(input => input.value)
+        .sort();
 
-      let districtsHtml = '';
-      this.selectedStates.forEach(state => {
+      const addedStates = this.selectedStates.filter(state => !prevSelectedStates.includes(state));
+      const removedStates = prevSelectedStates.filter(state => !this.selectedStates.includes(state));
+
+      removedStates.forEach(state => {
+        const stateDistrictsContainer = document.querySelector(`.districts-container[data-state="${state}"]`);
+        stateDistrictsContainer.remove();
+      });
+
+      addedStates.forEach(state => {
         const stateData = this.districtsData[state];
 
         let senateCheckboxesHtml = '';
         stateData.senate.forEach(code => {
-          const isChecked = this.selectedDistricts.includes(code) ? 'checked' : '';
           senateCheckboxesHtml += `
-            <div class="checkbox">
-              <input type="checkbox" name="district" value="${code}" id="checkbox-${code}" ${isChecked}>
-              <label for="checkbox-${code}">${code}</label>
-            </div>
-          `;
+              <div class="checkbox">
+                <input type="checkbox" name="district" value="${code}" id="checkbox-${code}">
+                <label for="checkbox-${code}">${code}</label>
+              </div>
+            `;
         });
 
         let houseCheckboxesHtml = '';
         stateData.house.forEach(code => {
-          const isChecked = this.selectedDistricts.includes(code) ? 'checked' : '';
           houseCheckboxesHtml += `
-            <div class="checkbox">
-             <input type="checkbox" name="district" value="${code}" id="checkbox-${code}" ${isChecked}>
-             <label for="checkbox-${code}">${code}</label>
-            </div>
-          `;
+              <div class="checkbox">
+               <input type="checkbox" name="district" value="${code}" id="checkbox-${code}">
+               <label for="checkbox-${code}">${code}</label>
+              </div>
+            `;
         });
 
-        districtsHtml += `
-          <div class="districts-container" data-state="${state}">
-            <h3>
-              ${state} House
-              (<span class="state-selected-house-districts-count">0</span> of ${stateData.house.length} districts selected)
-            </h3>
-            <div class="house-buttons" data-state="${state}">
-              <button class="btn btn-primary house-select-all" data-state="${state}">Select All</button>
-              <button class="btn btn-warning house-deselect-all" data-state="${state}">Deselect All</button>
+        let stateHtml = "";
+
+        if (houseCheckboxesHtml !== "") {
+          stateHtml += `
+              <h3>
+                ${state} House
+                (<span class="state-selected-house-districts-count">0</span> of ${stateData.house.length} districts selected)
+              </h3>
+              <div class="house-buttons" data-state="${state}">
+                <button class="btn btn-primary house-select-all" data-state="${state}">Select All</button>
+                <button class="btn btn-warning house-deselect-all" data-state="${state}">Deselect All</button>
+              </div>
+              <div class="house-districts" data-state="${state}">
+                ${houseCheckboxesHtml}
+              </div>
+            `
+        }
+
+        if (senateCheckboxesHtml !== "") {
+          stateHtml += `
+              <h3>
+                ${state} ${state === "DC" ? "Ward" : "Senate"}
+                (<span class="state-selected-senate-districts-count">0</span> of ${stateData.senate.length} ${state === "DC" ? "wards" : "districts"} selected)
+              </h3>
+              <div class="senate-buttons">
+                <button class="btn btn-primary senate-select-all" data-state="${state}">Select All</button>
+                <button class="btn btn-warning senate-deselect-all" data-state="${state}">Deselect All</button>
+              </div>
+              <div class="senate-districts" data-state="${state}">
+                ${senateCheckboxesHtml}
+              </div>
+            `
+        }
+
+        stateHtml = `
+            <div class="districts-container" data-state="${state}">
+              ${stateHtml}
             </div>
-            <div class="house-districts" data-state="${state}">
-              ${houseCheckboxesHtml}
-            </div>
-            <h3>
-              ${state} Senate
-              (<span class="state-selected-senate-districts-count">0</span> of ${stateData.senate.length} districts selected)
-            </h3>
-            <div class="senate-buttons">
-              <button class="btn btn-primary senate-select-all" data-state="${state}">Select All</button>
-              <button class="btn btn-warning senate-deselect-all" data-state="${state}">Deselect All</button>
-            </div>
-            <div class="senate-districts" data-state="${state}">
-              ${senateCheckboxesHtml}
-            </div>
-          </div>
-        `;
+          `;
+
+        if (districtContainer.children) {
+          const index = this.selectedStates.findIndex(s => s === state);
+          if (index === 0) {
+            districtContainer.insertAdjacentHTML('afterbegin', stateHtml);
+          } else {
+            districtContainer.children[index - 1].insertAdjacentHTML('afterend', stateHtml);
+          }
+        } else {
+          districtContainer.insertAdjacentHTML('beforeend', stateHtml);
+        }
       });
-
-      districtContainer.innerHTML = districtsHtml;
-
-      districtContainer.addEventListener('change', this.onDistrictChange.bind(this));
-      districtContainer.addEventListener('click', this.onDistrictClick.bind(this));
 
       this.setSelectedStatesCount();
     }
@@ -228,9 +258,10 @@
       this.setSelectedDistrictsCount();
       this.setPossibleDistrictsCount()
       this.setStateSelectedDistrictsCount();
+      this.setStatesWithSelectedDistrictsCount();
     }
 
-    onDistrictClick() {
+    onDistrictClick(event) {
       const target = event.target;
       const state = target.dataset.state;
 
@@ -296,10 +327,15 @@
           document.querySelectorAll(`.house-districts[data-state="${state}"] input[name="district"]:checked`).length;
         const senateSelectedCount =
           document.querySelectorAll(`.senate-districts[data-state="${state}"] input[name="district"]:checked`).length;
-        document.querySelector(`.districts-container[data-state="${state}"] .state-selected-house-districts-count`).textContent =
-          houseSelectedCount.toString();
-        document.querySelector(`.districts-container[data-state="${state}"] .state-selected-senate-districts-count`).textContent =
-          senateSelectedCount.toString();
+
+        const stateSelectedHouseCountEl = document.querySelector(`.districts-container[data-state="${state}"] .state-selected-house-districts-count`);
+        if (stateSelectedHouseCountEl) {
+          stateSelectedHouseCountEl.textContent = houseSelectedCount.toString();
+        }
+        const stateSelectedSenateCountEl = document.querySelector(`.districts-container[data-state="${state}"] .state-selected-senate-districts-count`);
+        if (stateSelectedSenateCountEl) {
+          stateSelectedSenateCountEl.textContent = senateSelectedCount.toString();
+        }
       });
     }
 
@@ -312,6 +348,18 @@
       document.querySelector('.deselect-all-districts').addEventListener('click', () => {
         document.querySelectorAll('input[name="district"]').forEach(input => input.checked = false);
         this.onDistrictChange();
+      });
+    }
+
+    setStatesWithSelectedDistrictsCount() {
+      const statesWithSelectedDistrictsCount = this.selectedStates.reduce((acc, state) => {
+        if (document.querySelector(`.districts-container[data-state="${state}"] input[name="district"]:checked`)) {
+          return acc + 1;
+        }
+        return acc;
+      }, 0);
+      document.querySelectorAll('.states-with-selected-districts-count').forEach(el => {
+        el.textContent = statesWithSelectedDistrictsCount.toString();
       });
     }
   }
