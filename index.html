@@ -1,20 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>District Code Selector</title>
   <style>
     :root {
-      --color_primary: #007bff;
-      --color_warning: #e51414;
-      --color_success: #28a745;
+      --background-color_primary: #007bff;
+      --color_primary: rgb(255 255 255);
+      --background-color_warning: rgb(215 114 127);
+      --color_warning: rgb(255 255 255);
+      --background-color_success: rgb(85 209 124);
+      --color_success: rgb(255 255 255);
+      --background-color_neutral: rgb(232 232 232);
+      --color_neutral: rgb(51 51 51);
     }
 
     *,
     *:before,
     *:after {
       box-sizing: border-box;
+    }
+
+    /* latin */
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 300;
+      font-display: swap;
+      src: url(https://www.engagingnetworks.support/wp-content/fonts/montserrat/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCs16Hw5aXx-p7K4GLs.woff) format('woff');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    /* latin */
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url(https://www.engagingnetworks.support/wp-content/fonts/montserrat/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtZ6Hw5aXx-p7K4GLs.woff) format('woff');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
     }
 
     body,
@@ -25,14 +51,14 @@
 
     body {
       font-size: 16px;
-      background-color: rgb(243, 244, 246);
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+      background-color: rgb(255 255 255);
+      font-family: Montserrat, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
     }
 
     #app {
       max-width: 1200px;
       padding: 0 15px;
-      margin: 0 auto;
+      margin: 1rem auto;
     }
 
     #state-container,
@@ -41,24 +67,41 @@
       column-width: 160px;
     }
 
+    #state-container {
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      margin-bottom: 0.75rem;
+    }
+
     .btn {
-      border: 1px solid var(--color_primary);
-      background-color: var(--color_primary);
-      color: #fff;
-      font-size: 1rem;
+      border: 1px solid var(--background-color_primary);
+      background-color: var(--background-color_primary);
+      color: var(--color_primary);
+      font-size: 1.15rem;
       padding: 0.4rem 0.75rem;
       border-radius: 0.25rem;
       cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-neutral {
+      border-color: var(--background-color_neutral);
+      background-color: var(--background-color_neutral);
+      color: var(--color_neutral);
     }
 
     .btn-success {
-      border-color: var(--color_success);
-      background-color: var(--color_success);
+      border-color: var(--background-color_success);
+      background-color: var(--background-color_success);
+      color: var(--color_success);
     }
 
     .btn-warning {
-      border-color: var(--color_warning);
-      background-color: var(--color_warning);
+      border-color: var(--background-color_warning);
+      background-color: var(--background-color_warning);
+      color: var(--color_warning);
     }
 
     .btn[disabled] {
@@ -66,305 +109,360 @@
       cursor: not-allowed;
     }
 
+    .checkbox {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+    }
+
     .checkbox input[type="checkbox"] {
       height: 1rem;
       width: 1rem;
+      margin: 0;
+    }
+
+    .checkbox input[type="checkbox"]+label {
+      padding-left: 5px;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      line-break: anywhere;
     }
 
     .checkbox label {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: Montserrat, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
     .house-buttons,
     .senate-buttons {
       margin-bottom: 1rem;
     }
+
+    .quick-button {
+      margin-bottom: 0.5rem;
+    }
+
+    .pseudo-hkb-article__title {
+      background-color: rgb(232 232 232);
+      font-weight: 500;
+      padding: 20px;
+      border-radius: 6px;
+      color: rgb(51 51 51);
+      font-size: 37px;
+      line-height: 1.3;
+      margin: 0 0 30px;
+    }
+
+    #summary {
+      background: #f4f5f5;
+      margin: 30px 0 0;
+      padding: 20px;
+      border-radius: 6px;
+    }
+
+    #summary h2 {
+      margin-top: 0;
+    }
+
+    #summary p {
+      margin-top: 0;
+    }
   </style>
 </head>
+
 <body>
-<div id="app">
-  <h1>District Code Selector</h1>
-  <h3>States</h3>
-  <div id="state-container"></div>
-  <div id="district-container"></div>
-  <div id="summary">
-    <h3>Summary</h3>
-    <div style="margin-bottom: 1.2rem">
-      <button class="btn btn-primary select-all-districts">Select all districts</button>
-      <button class="btn btn-warning deselect-all-districts">Deselect all districts</button>
+  <div id="app">
+    <h1 class="pseudo-hkb-article__title">District Code Selector</h1>
+    <h3>Pick Your States</h3>
+    <div id="state-container"></div>
+    <div id="district-container"></div>
+    <div id="quick-selection">
+      <h2>Quick Selection</h2>
+      <div style="margin-bottom: 1.2rem">
+        <button class="btn btn-primary select-all-districts quick-button">Select all visible
+          districts and wards</button><br>
+        <button class="btn btn-warning deselect-all-districts quick-button">Deselect all visible
+          districts and wards</button>
+      </div>
     </div>
-    <button class="btn btn-success copy-districts">
-      Copy <span class="selected-districts-count">0</span> districts to clipboard
-    </button>
-    <p>
-      <span class="states-with-selected-districts-count">0</span> of <span class="selected-states-count">0</span> States Selected,
-      <span class="selected-districts-count">0</span> of <span class="possible-districts-count">0</span> Districts/Wards Selected
-    </p>
+    <div id="summary">
+      <h2>Selection Summary</h2>
+      <p>
+        <span class="states-with-selected-districts-count">0</span> of <span class="selected-states-count">0</span>
+        Regions Selected<br>
+        <span class="selected-districts-count">0</span> of <span class="possible-districts-count">0</span>
+        Districts and Wards Selected
+      </p>
+
+      <button class="btn btn-success copy-districts">
+        Copy <span class="selected-districts-count">0</span> to clipboard
+      </button>
+
+    </div>
   </div>
-</div>
 
-<script>
-  class DistrictCodeSelector {
-    constructor(csv) {
-      this.districtsData = {};
-      this.selectedStates = [];
-      this.selectedDistricts = [];
-      this.getDataFromCsv(csv);
-      this.createStatesCheckboxes();
-      this.setupCopyDistrictsButton();
-      this.setupSelectAndDeselectAllButtons();
-      const districtContainer = document.getElementById('district-container');
-      districtContainer.addEventListener('change', this.onDistrictChange.bind(this));
-      districtContainer.addEventListener('click', this.onDistrictClick.bind(this));
-    }
+  <script>
+    class DistrictCodeSelector {
+      constructor(csv) {
+        this.districtsData = {};
+        this.selectedStates = [];
+        this.selectedDistricts = [];
+        this.getDataFromCsv(csv);
+        this.createStatesCheckboxes();
+        this.setupCopyDistrictsButton();
+        this.setupSelectAndDeselectAllButtons();
+        const districtContainer = document.getElementById('district-container');
+        districtContainer.addEventListener('change', this.onDistrictChange.bind(this));
+        districtContainer.addEventListener('click', this.onDistrictClick.bind(this));
+      }
 
-    getDataFromCsv() {
-      const lines = csvData.trim().split('\n');
-      lines.forEach(line => {
-        const [chamber, code, state] = line.split(',');
-        if (!this.districtsData[state]) {
-          this.districtsData[state] = {
-            senate: [],
-            house: []
-          };
-        }
-        const stateData = this.districtsData[state];
-        if (chamber === 'Senate') {
-          stateData.senate.push(code);
-        } else {
-          stateData.house.push(code);
-        }
-      });
-    }
+      getDataFromCsv() {
+        const lines = csvData.trim().split('\n');
+        lines.forEach(line => {
+          const [chamber, code, state] = line.split(',');
+          if (!this.districtsData[state]) {
+            this.districtsData[state] = {
+              senate: [],
+              house: []
+            };
+          }
+          const stateData = this.districtsData[state];
+          if (chamber === 'Senate') {
+            stateData.senate.push(code);
+          } else {
+            stateData.house.push(code);
+          }
+        });
+      }
 
-    createStatesCheckboxes() {
-      const statesContainer = document.getElementById('state-container');
+      createStatesCheckboxes() {
+        const statesContainer = document.getElementById('state-container');
 
-      let stateCheckboxHtml = '';
-      Object.keys(this.districtsData).sort().forEach(state => {
-        stateCheckboxHtml += `
+        let stateCheckboxHtml = '';
+        Object.keys(this.districtsData).sort().forEach(state => {
+          stateCheckboxHtml += `
           <div class="checkbox">
             <input type="checkbox" name="state" value="${state}" id="checkbox-${state}">
             <label for="checkbox-${state}">${state}</label>
           </div>
         `;
-      });
-      statesContainer.insertAdjacentHTML('beforeend', stateCheckboxHtml);
+        });
+        statesContainer.insertAdjacentHTML('beforeend', stateCheckboxHtml);
 
-      statesContainer.addEventListener('change', () => {
-        this.onStateChange();
-        this.onDistrictChange();
-      });
-    }
+        statesContainer.addEventListener('change', () => {
+          this.onStateChange();
+          this.onDistrictChange();
+        });
+      }
 
-    onStateChange() {
-      const statesContainer = document.getElementById('state-container');
-      const districtContainer = document.getElementById('district-container');
+      onStateChange() {
+        const statesContainer = document.getElementById('state-container');
+        const districtContainer = document.getElementById('district-container');
 
-      const prevSelectedStates = this.selectedStates;
-      this.selectedStates = [...statesContainer.querySelectorAll('input[name="state"]:checked')]
-        .map(input => input.value)
-        .sort();
+        const prevSelectedStates = this.selectedStates;
+        this.selectedStates = [...statesContainer.querySelectorAll('input[name="state"]:checked')]
+          .map(input => input.value)
+          .sort();
 
-      const addedStates = this.selectedStates.filter(state => !prevSelectedStates.includes(state));
-      const removedStates = prevSelectedStates.filter(state => !this.selectedStates.includes(state));
+        const addedStates = this.selectedStates.filter(state => !prevSelectedStates.includes(state));
+        const removedStates = prevSelectedStates.filter(state => !this.selectedStates.includes(state));
 
-      removedStates.forEach(state => {
-        const stateDistrictsContainer = document.querySelector(`.districts-container[data-state="${state}"]`);
-        stateDistrictsContainer.remove();
-      });
+        removedStates.forEach(state => {
+          const stateDistrictsContainer = document.querySelector(`.districts-container[data-state="${state}"]`);
+          stateDistrictsContainer.remove();
+        });
 
-      addedStates.forEach(state => {
-        const stateData = this.districtsData[state];
+        addedStates.forEach(state => {
+          const stateData = this.districtsData[state];
 
-        let senateCheckboxesHtml = '';
-        stateData.senate.forEach(code => {
-          senateCheckboxesHtml += `
+          let senateCheckboxesHtml = '';
+          stateData.senate.forEach(code => {
+            senateCheckboxesHtml += `
               <div class="checkbox">
                 <input type="checkbox" name="district" value="${code}" id="checkbox-${code}">
                 <label for="checkbox-${code}">${code}</label>
               </div>
             `;
-        });
+          });
 
-        let houseCheckboxesHtml = '';
-        stateData.house.forEach(code => {
-          houseCheckboxesHtml += `
+          let houseCheckboxesHtml = '';
+          stateData.house.forEach(code => {
+            houseCheckboxesHtml += `
               <div class="checkbox">
                <input type="checkbox" name="district" value="${code}" id="checkbox-${code}">
                <label for="checkbox-${code}">${code}</label>
               </div>
             `;
-        });
+          });
 
-        let stateHtml = "";
+          let stateHtml = "";
 
-        if (houseCheckboxesHtml !== "") {
-          stateHtml += `
+          if (houseCheckboxesHtml !== "") {
+            stateHtml += `
               <h3>
                 ${state} House
                 (<span class="state-selected-house-districts-count">0</span> of ${stateData.house.length} districts selected)
               </h3>
               <div class="house-buttons" data-state="${state}">
-                <button class="btn btn-primary house-select-all" data-state="${state}">Select All</button>
-                <button class="btn btn-warning house-deselect-all" data-state="${state}">Deselect All</button>
+                <button class="btn btn-neutral house-select-all" data-state="${state}">Select All</button>
+                <button class="btn btn-neutral house-deselect-all" data-state="${state}">Deselect All</button>
               </div>
               <div class="house-districts" data-state="${state}">
                 ${houseCheckboxesHtml}
               </div>
             `
-        }
+          }
 
-        if (senateCheckboxesHtml !== "") {
-          stateHtml += `
+          if (senateCheckboxesHtml !== "") {
+            stateHtml += `
               <h3>
                 ${state} ${state === "DC" ? "Ward" : "Senate"}
                 (<span class="state-selected-senate-districts-count">0</span> of ${stateData.senate.length} ${state === "DC" ? "wards" : "districts"} selected)
               </h3>
               <div class="senate-buttons">
-                <button class="btn btn-primary senate-select-all" data-state="${state}">Select All</button>
-                <button class="btn btn-warning senate-deselect-all" data-state="${state}">Deselect All</button>
+                <button class="btn btn-neutral senate-select-all" data-state="${state}">Select All</button>
+                <button class="btn btn-neutral senate-deselect-all" data-state="${state}">Deselect All</button>
               </div>
               <div class="senate-districts" data-state="${state}">
                 ${senateCheckboxesHtml}
               </div>
             `
-        }
+          }
 
-        stateHtml = `
+          stateHtml = `
             <div class="districts-container" data-state="${state}">
               ${stateHtml}
             </div>
           `;
 
-        if (districtContainer.children) {
-          const index = this.selectedStates.findIndex(s => s === state);
-          if (index === 0) {
-            districtContainer.insertAdjacentHTML('afterbegin', stateHtml);
+          if (districtContainer.children) {
+            const index = this.selectedStates.findIndex(s => s === state);
+            if (index === 0) {
+              districtContainer.insertAdjacentHTML('afterbegin', stateHtml);
+            } else {
+              districtContainer.children[index - 1].insertAdjacentHTML('afterend', stateHtml);
+            }
           } else {
-            districtContainer.children[index - 1].insertAdjacentHTML('afterend', stateHtml);
+            districtContainer.insertAdjacentHTML('beforeend', stateHtml);
           }
-        } else {
-          districtContainer.insertAdjacentHTML('beforeend', stateHtml);
-        }
-      });
+        });
 
-      this.setSelectedStatesCount();
-    }
-
-    onDistrictChange() {
-      const districtContainer = document.getElementById('district-container');
-      this.selectedDistricts = [...districtContainer.querySelectorAll('input[name="district"]:checked')].map(input => input.value);
-      this.setSelectedDistrictsCount();
-      this.setPossibleDistrictsCount()
-      this.setStateSelectedDistrictsCount();
-      this.setStatesWithSelectedDistrictsCount();
-    }
-
-    onDistrictClick(event) {
-      const target = event.target;
-      const state = target.dataset.state;
-
-      if (target.classList.contains('senate-select-all')) {
-        document.querySelectorAll(`.senate-districts[data-state="${state}"] input`)
-          .forEach(input => input.checked = true);
-      } else if (target.classList.contains('senate-deselect-all')) {
-        document.querySelectorAll(`.senate-districts[data-state="${state}"] input`)
-          .forEach(input => input.checked = false);
-      } else if (target.classList.contains('house-select-all')) {
-        document.querySelectorAll(`.house-districts[data-state="${state}"] input`)
-          .forEach(input => input.checked = true);
-      } else if (target.classList.contains('house-deselect-all')) {
-        document.querySelectorAll(`.house-districts[data-state="${state}"] input`)
-          .forEach(input => input.checked = false);
+        this.setSelectedStatesCount();
       }
 
-      this.onDistrictChange();
-    }
+      onDistrictChange() {
+        const districtContainer = document.getElementById('district-container');
+        this.selectedDistricts = [...districtContainer.querySelectorAll('input[name="district"]:checked')].map(input => input.value);
+        this.setSelectedDistrictsCount();
+        this.setPossibleDistrictsCount()
+        this.setStateSelectedDistrictsCount();
+        this.setStatesWithSelectedDistrictsCount();
+      }
 
-    setSelectedDistrictsCount() {
-      document.querySelectorAll('.selected-districts-count').forEach(el => {
-        el.textContent = this.selectedDistricts.length.toString();
-      });
-    }
+      onDistrictClick(event) {
+        const target = event.target;
+        const state = target.dataset.state;
 
-    setSelectedStatesCount() {
-      document.querySelectorAll('.selected-states-count').forEach(el => {
-        el.textContent = this.selectedStates.length.toString();
-      });
-    }
-
-    setPossibleDistrictsCount() {
-      const possibleDistrictsCount = this.selectedStates.reduce((acc, state) => {
-        const stateData = this.districtsData[state];
-        return acc + stateData.senate.length + stateData.house.length;
-      }, 0);
-      document.querySelectorAll('.possible-districts-count').forEach(el => {
-        el.textContent = possibleDistrictsCount.toString();
-      });
-    }
-
-    setupCopyDistrictsButton() {
-      const copyDistrictsButton = document.querySelector('.copy-districts');
-      copyDistrictsButton.addEventListener('click', () => {
-        const districtsString = this.selectedDistricts.join('~');
-        navigator.clipboard.writeText(districtsString);
-
-        copyDistrictsButton.setAttribute('data-old-html', copyDistrictsButton.innerHTML);
-        copyDistrictsButton.textContent = 'Copied!';
-        copyDistrictsButton.setAttribute('disabled', "true");
-
-        setTimeout(() => {
-          copyDistrictsButton.innerHTML = copyDistrictsButton.getAttribute('data-old-html');
-          copyDistrictsButton.removeAttribute('disabled');
-        }, 2000)
-      });
-    }
-
-    setStateSelectedDistrictsCount() {
-      this.selectedStates.forEach(state => {
-        const houseSelectedCount =
-          document.querySelectorAll(`.house-districts[data-state="${state}"] input[name="district"]:checked`).length;
-        const senateSelectedCount =
-          document.querySelectorAll(`.senate-districts[data-state="${state}"] input[name="district"]:checked`).length;
-
-        const stateSelectedHouseCountEl = document.querySelector(`.districts-container[data-state="${state}"] .state-selected-house-districts-count`);
-        if (stateSelectedHouseCountEl) {
-          stateSelectedHouseCountEl.textContent = houseSelectedCount.toString();
+        if (target.classList.contains('senate-select-all')) {
+          document.querySelectorAll(`.senate-districts[data-state="${state}"] input`)
+            .forEach(input => input.checked = true);
+        } else if (target.classList.contains('senate-deselect-all')) {
+          document.querySelectorAll(`.senate-districts[data-state="${state}"] input`)
+            .forEach(input => input.checked = false);
+        } else if (target.classList.contains('house-select-all')) {
+          document.querySelectorAll(`.house-districts[data-state="${state}"] input`)
+            .forEach(input => input.checked = true);
+        } else if (target.classList.contains('house-deselect-all')) {
+          document.querySelectorAll(`.house-districts[data-state="${state}"] input`)
+            .forEach(input => input.checked = false);
         }
-        const stateSelectedSenateCountEl = document.querySelector(`.districts-container[data-state="${state}"] .state-selected-senate-districts-count`);
-        if (stateSelectedSenateCountEl) {
-          stateSelectedSenateCountEl.textContent = senateSelectedCount.toString();
-        }
-      });
-    }
 
-    setupSelectAndDeselectAllButtons() {
-      document.querySelector('.select-all-districts').addEventListener('click', () => {
-        document.querySelectorAll('input[name="district"]').forEach(input => input.checked = true);
         this.onDistrictChange();
-      });
+      }
 
-      document.querySelector('.deselect-all-districts').addEventListener('click', () => {
-        document.querySelectorAll('input[name="district"]').forEach(input => input.checked = false);
-        this.onDistrictChange();
-      });
+      setSelectedDistrictsCount() {
+        document.querySelectorAll('.selected-districts-count').forEach(el => {
+          el.textContent = this.selectedDistricts.length.toString();
+        });
+      }
+
+      setSelectedStatesCount() {
+        document.querySelectorAll('.selected-states-count').forEach(el => {
+          el.textContent = this.selectedStates.length.toString();
+        });
+      }
+
+      setPossibleDistrictsCount() {
+        const possibleDistrictsCount = this.selectedStates.reduce((acc, state) => {
+          const stateData = this.districtsData[state];
+          return acc + stateData.senate.length + stateData.house.length;
+        }, 0);
+        document.querySelectorAll('.possible-districts-count').forEach(el => {
+          el.textContent = possibleDistrictsCount.toString();
+        });
+      }
+
+      setupCopyDistrictsButton() {
+        const copyDistrictsButton = document.querySelector('.copy-districts');
+        copyDistrictsButton.addEventListener('click', () => {
+          const districtsString = this.selectedDistricts.join('~');
+          navigator.clipboard.writeText(districtsString);
+
+          copyDistrictsButton.setAttribute('data-old-html', copyDistrictsButton.innerHTML);
+          copyDistrictsButton.textContent = 'Copied!';
+          copyDistrictsButton.setAttribute('disabled', "true");
+
+          setTimeout(() => {
+            copyDistrictsButton.innerHTML = copyDistrictsButton.getAttribute('data-old-html');
+            copyDistrictsButton.removeAttribute('disabled');
+          }, 1000)
+        });
+      }
+
+      setStateSelectedDistrictsCount() {
+        this.selectedStates.forEach(state => {
+          const houseSelectedCount =
+            document.querySelectorAll(`.house-districts[data-state="${state}"] input[name="district"]:checked`).length;
+          const senateSelectedCount =
+            document.querySelectorAll(`.senate-districts[data-state="${state}"] input[name="district"]:checked`).length;
+
+          const stateSelectedHouseCountEl = document.querySelector(`.districts-container[data-state="${state}"] .state-selected-house-districts-count`);
+          if (stateSelectedHouseCountEl) {
+            stateSelectedHouseCountEl.textContent = houseSelectedCount.toString();
+          }
+          const stateSelectedSenateCountEl = document.querySelector(`.districts-container[data-state="${state}"] .state-selected-senate-districts-count`);
+          if (stateSelectedSenateCountEl) {
+            stateSelectedSenateCountEl.textContent = senateSelectedCount.toString();
+          }
+        });
+      }
+
+      setupSelectAndDeselectAllButtons() {
+        document.querySelector('.select-all-districts').addEventListener('click', () => {
+          document.querySelectorAll('input[name="district"]').forEach(input => input.checked = true);
+          this.onDistrictChange();
+        });
+
+        document.querySelector('.deselect-all-districts').addEventListener('click', () => {
+          document.querySelectorAll('input[name="district"]').forEach(input => input.checked = false);
+          this.onDistrictChange();
+        });
+      }
+
+      setStatesWithSelectedDistrictsCount() {
+        const statesWithSelectedDistrictsCount = this.selectedStates.reduce((acc, state) => {
+          if (document.querySelector(`.districts-container[data-state="${state}"] input[name="district"]:checked`)) {
+            return acc + 1;
+          }
+          return acc;
+        }, 0);
+        document.querySelectorAll('.states-with-selected-districts-count').forEach(el => {
+          el.textContent = statesWithSelectedDistrictsCount.toString();
+        });
+      }
     }
 
-    setStatesWithSelectedDistrictsCount() {
-      const statesWithSelectedDistrictsCount = this.selectedStates.reduce((acc, state) => {
-        if (document.querySelector(`.districts-container[data-state="${state}"] input[name="district"]:checked`)) {
-          return acc + 1;
-        }
-        return acc;
-      }, 0);
-      document.querySelectorAll('.states-with-selected-districts-count').forEach(el => {
-        el.textContent = statesWithSelectedDistrictsCount.toString();
-      });
-    }
-  }
-
-  const csvData = `
+    const csvData = `
 House,AK0001,AK
 House,AK0010,AK
 House,AK0011,AK
@@ -7193,7 +7291,8 @@ Senate,WYS008,WY
 Senate,WYS009,WY
 `;
 
-  new DistrictCodeSelector(csvData);
-</script>
+    new DistrictCodeSelector(csvData);
+  </script>
 </body>
+
 </html>
