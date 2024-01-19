@@ -167,6 +167,14 @@
     #summary p {
       margin-top: 0;
     }
+
+    textarea {
+      margin-top: 1rem;
+      width: 100%;
+      max-width: 500px;
+      resize: none;
+      padding: 5px;
+    }
   </style>
 </head>
 
@@ -198,6 +206,10 @@
         Copy <span class="selected-districts-count">0</span> to clipboard
       </button>
 
+      <div>
+        <label for="output" style="display: none">Output</label>
+        <textarea id="output" rows="8" disabled></textarea>
+      </div>
     </div>
   </div>
 
@@ -207,6 +219,7 @@
         this.districtsData = {};
         this.selectedStates = [];
         this.selectedDistricts = [];
+        this.outputTextarea = document.getElementById('output');
         this.getDataFromCsv(csv);
         this.createStatesCheckboxes();
         this.setupCopyDistrictsButton();
@@ -353,6 +366,7 @@
       onDistrictChange() {
         const districtContainer = document.getElementById('district-container');
         this.selectedDistricts = [...districtContainer.querySelectorAll('input[name="district"]:checked')].map(input => input.value);
+        this.outputTextarea.value = this.selectedDistricts.join('~');
         this.setSelectedDistrictsCount();
         this.setPossibleDistrictsCount()
         this.setStateSelectedDistrictsCount();
@@ -3289,9 +3303,6 @@ House,ND0007,ND
 House,ND0008,ND
 House,ND009A,ND
 House,ND009B,ND
-House,NEH001,NE
-House,NEH002,NE
-House,NEH003,NE
 House,NH0BE1,NH
 House,NH0BE2,NH
 House,NH0BE3,NH
